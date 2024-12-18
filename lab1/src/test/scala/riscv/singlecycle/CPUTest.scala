@@ -106,6 +106,23 @@ class QuicksortTest extends AnyFlatSpec with ChiselScalatestTester {
   }
 }
 
+class bubblesortTest extends AnyFlatSpec with ChiselScalatestTester {
+  behavior of "Single Cycle CPU"
+  it should "bubblesort 10 numbers" in {
+    test(new TestTopModule("bubble.asmbin")).withAnnotations(TestAnnotations.annos) { c =>
+      for (i <- 1 to 50) {
+        c.clock.step(1000)
+        c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
+      }
+      for (i <- 1 to 10) {
+        c.io.mem_debug_read_address.poke((4 * i).U)
+        c.clock.step()
+        c.io.mem_debug_read_data.expect((i - 1).U)
+      }
+    }
+  }
+}
+
 class ByteAccessTest extends AnyFlatSpec with ChiselScalatestTester {
   behavior of "Single Cycle CPU"
   it should "store and load single byte" in {
